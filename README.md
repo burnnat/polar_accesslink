@@ -1,55 +1,59 @@
-# Polar Open AccessLink example application
+# Polar AccessLink API Client
 
-This is an example application that uses the [Polar Open AccessLink](https://www.polar.com/accesslink-api) API.
-With the Polar Open AccessLink you can access the training and daily activity data recorded with Polar devices.
+[![image](https://img.shields.io/pypi/v/polar_accesslink.svg)](https://pypi.python.org/pypi/polar_accesslink)
+
+Library to enable access to Polar training data through the [Polar Open AccessLink](https://www.polar.com/accesslink-api) API. This library is a forked and packaged version of the offical [Polar AccessLink example client](https://github.com/polarofficial/accesslink-example-python).
+
+  - Free software: MIT license
 
 ## Prerequisites
 
 * [Polar Flow](https://flow.polar.com) account
-* Python and pip
 
 ## Getting Started
 
 #### 1. Create new API client 
  
-Navigate to https://admin.polaraccesslink.com. Log in with your Polar Flow account and create a new client.
+Navigate to https://admin.polaraccesslink.com. Log in with your Polar Flow account and create a new client using an appropriate OAuth2 callback URL for your application. Note the client ID and client secret -- you will need these later.
 
-Use `http://localhost:5000/oauth2_callback` as the authorization callback domain for this example.
-  
-#### 2. Configure client credentials
+#### 2. Link user 
 
-Fill in your client id and secret in config.yml:
+User account needs to be linked to client application before client can get any user data. User is asked for authorization in Polar Flow, and user is redirected back to application callback url with authorization code once user has accepted the request. Navigate to 'https://flow.polar.com/oauth2/authorization?response_type=code&client_id=CLIENT_ID' to link your user account. Your application should handle the callback request appropriately, storing the user ID and access token which will be necessary for later API calls. The user must first be registered with the given access token before additional API calls can be made.
 
+Sample code:
 ```
-client_id: 57a715f8-b7e8-11e7-abc4-cec278b6b50a
-client_secret: 62c54f4a-b7e8-11e7-abc4-cec278b6b50a
-```
-  
-#### 3. Install python dependencies
+from accesslink import AccessLink
 
-```
-pip install -r requirements.txt
-```
+accesslink = AccessLink(client_id=CLIENT_ID,
+                        client_secret=CLIENT_SECRET,
+                        redirect_url=REDIRECT_URL)
 
-#### 4. Link user 
+authorization_code = request.args.get("code")
+token_response = accesslink.get_access_token(authorization_code)
 
-User account needs to be linked to client application before client can get any user data. User is asked for authorization 
-in Polar Flow, and user is redirected back to application callback url with authorization code once user has accepted the request.
- 
-To start example callback service, run:
+USER_ID = token_response["x_user_id"]
+ACCESS_TOKEN = token_response["access_token"]
 
-```
-python authorization.py
-```
-
-and navigate to 'https://flow.polar.com/oauth2/authorization?response_type=code&client_id=CLIENT_ID' to link user account.
-
-#### 5. Run example application
-    
-```
-python accesslink_example.py
+try:
+    accesslink.users.register(access_token=ACCESS_TOKEN)
+except requests.exceptions.HTTPError as err:
+    # Error 409 Conflict means that the user has already been registered for this client.
+    # For most applications, that error can be ignored.
+    if err.response.status_code != 409:
+        raise err
 ```
 
-Once user has linked their user account to client application and synchronizes data from Polar device to Polar Flow, 
-application is able to load data. Selecting 'Check available data' option from example application menu loads the 
-synchronized data from Polar Flow and prints it on the screen.
+#### 3. Access API data
+
+Once user has linked their user account to client application and synchronizes data from Polar device to Polar Flow, application is able to load data.
+
+Sample code:
+```
+from accesslink import AccessLink
+
+accesslink = AccessLink(client_id=CLIENT_ID,
+                        client_secret=CLIENT_SECRET)
+
+user_info = accesslink.users.get_information(user_id=USER_ID,
+                                             access_token=ACCESS_TOKEN)
+```
