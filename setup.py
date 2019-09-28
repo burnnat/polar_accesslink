@@ -40,6 +40,6 @@ setup(
     packages=find_packages(exclude=['tests']),
     setup_requires=setup_requirements,
     url='https://github.com/burnnat/polar_accesslink',
-    version='0.0.1',
+    version='0.0.2',
     zip_safe=False,
 )
