@@ -37,7 +37,7 @@ setup(
     include_package_data=True,
     keywords='polar_accesslink',
     name='polar_accesslink',
-    packages=find_packages(include=['accesslink']),
+    packages=find_packages(exclude=['tests']),
     setup_requires=setup_requirements,
     url='https://github.com/burnnat/polar_accesslink',
     version='0.0.1',
