@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+import logging
+
 import requests
 from requests.auth import HTTPBasicAuth
 from requests.exceptions import HTTPError
@@ -8,6 +10,8 @@ try:
     from urllib.parse import urlencode
 except ImportError:
     from urllib import urlencode
+
+_LOGGER = logging.getLogger(__name__)
 
 class OAuth2Client(object):
     """Wrapper class for OAuth2 requests"""
@@ -30,13 +34,16 @@ class OAuth2Client(object):
             "Accept": "application/json"
         }
 
-    def get_authorization_url(self, response_type="code"):
+    def get_authorization_url(self, response_type="code", state=None):
         """Build authorization url for the client"""
 
         params = {
             "client_id": self.client_id,
             "response_type": response_type,
         }
+
+        if state:
+            params["state"] = state
 
         if self.redirect_url:
             params["redirect_uri"] = self.redirect_url
@@ -56,6 +63,8 @@ class OAuth2Client(object):
             "grant_type" : "authorization_code",
             "code" : authorization_code
         }
+
+        _LOGGER.debug('Fetching access token from auth code')
 
         return self.post(endpoint=None,
                          url=self.access_token_url,
@@ -122,13 +131,17 @@ class OAuth2Client(object):
         return self.__parse_response(response)
 
     def get(self, endpoint, **kwargs):
+        _LOGGER.debug('GET request to endpoint: ' + endpoint)
         return self.__request("get", endpoint=endpoint, **kwargs)
 
     def post(self, endpoint, **kwargs):
+        _LOGGER.debug('POST request to endpoint: ' + endpoint)
         return self.__request("post", endpoint=endpoint, **kwargs)
 
     def put(self, endpoint, **kwargs):
+        _LOGGER.debug('PUT request to endpoint: ' + endpoint)
         return self.__request("put", endpoint=endpoint, **kwargs)
 
     def delete(self, endpoint, **kwargs):
+        _LOGGER.debug('DELETE request to endpoint: ' + endpoint)
         return self.__request("delete", endpoint=endpoint, **kwargs)

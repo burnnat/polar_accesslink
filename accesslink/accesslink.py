@@ -28,10 +28,9 @@ class AccessLink(object):
         self.physical_info = endpoints.PhysicalInfo(oauth=self.oauth)
         self.daily_activity = endpoints.DailyActivity(oauth=self.oauth)
 
-    @property
-    def authorization_url(self):
+    def get_authorization_url(self, state=None):
         """Get the authorization url for the client"""
-        return self.oauth.get_authorization_url()
+        return self.oauth.get_authorization_url(state=state)
 
     def get_access_token(self, authorization_code):
         """Request access token for a user.
