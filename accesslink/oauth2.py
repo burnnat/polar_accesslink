@@ -127,21 +127,20 @@ class OAuth2Client(object):
 
     def __request(self, method, **kwargs):
         kwargs = self.__build_request_kwargs(**kwargs)
+
+        _LOGGER.debug("%s request to URL: %s", method.upper(), kwargs["url"])
+
         response = requests.request(method, **kwargs)
         return self.__parse_response(response)
 
     def get(self, endpoint, **kwargs):
-        _LOGGER.debug('GET request to endpoint: ' + endpoint)
         return self.__request("get", endpoint=endpoint, **kwargs)
 
     def post(self, endpoint, **kwargs):
-        _LOGGER.debug('POST request to endpoint: ' + endpoint)
         return self.__request("post", endpoint=endpoint, **kwargs)
 
     def put(self, endpoint, **kwargs):
-        _LOGGER.debug('PUT request to endpoint: ' + endpoint)
         return self.__request("put", endpoint=endpoint, **kwargs)
 
     def delete(self, endpoint, **kwargs):
-        _LOGGER.debug('DELETE request to endpoint: ' + endpoint)
         return self.__request("delete", endpoint=endpoint, **kwargs)
