@@ -64,6 +64,9 @@ class OAuth2Client(object):
             "code" : authorization_code
         }
 
+        if self.redirect_url:
+            data["redirect_uri"] = self.redirect_url
+
         _LOGGER.debug('Fetching access token from auth code')
 
         return self.post(endpoint=None,

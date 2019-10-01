@@ -16,9 +16,26 @@ Library to enable access to Polar training data through the [Polar Open AccessLi
  
 Navigate to https://admin.polaraccesslink.com. Log in with your Polar Flow account and create a new client using an appropriate OAuth2 callback URL for your application. Note the client ID and client secret -- you will need these later.
 
-#### 2. Link user 
+#### 2. Authorize access 
 
-User account needs to be linked to client application before client can get any user data. User is asked for authorization in Polar Flow, and user is redirected back to application callback url with authorization code once user has accepted the request. Navigate to 'https://flow.polar.com/oauth2/authorization?response_type=code&client_id=CLIENT_ID' to link your user account. Your application should handle the callback request appropriately, storing the user ID and access token which will be necessary for later API calls. The user must first be registered with the given access token before additional API calls can be made.
+User account needs to be linked to client application before client can get any user data. User is asked for authorization in Polar Flow, and user is redirected back to application callback url with authorization code once user has accepted the request. Navigate to the URL given by `get_authorization_url()` to authorize the account access.
+
+Sample code:
+```
+from accesslink import AccessLink
+
+accesslink = AccessLink(client_id=CLIENT_ID,
+                        client_secret=CLIENT_SECRET,
+                        redirect_url=REDIRECT_URL)
+
+# Navigate the user to the following URL so they can complete the authorization form.
+# Code for this will vary by application.
+auth_url = accesslink.get_authorization_url()
+```
+
+#### 3. Link user
+
+Your application should handle the callback request appropriately, storing the user ID and access token which will be necessary for later API calls. The user must first be registered with the given access token before additional API calls can be made.
 
 Sample code:
 ```
@@ -43,7 +60,7 @@ except requests.exceptions.HTTPError as err:
         raise err
 ```
 
-#### 3. Access API data
+#### 4. Access API data
 
 Once user has linked their user account to client application and synchronizes data from Polar device to Polar Flow, application is able to load data.
 
