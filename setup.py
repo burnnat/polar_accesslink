@@ -19,6 +19,7 @@ setup_requirements = [ ]
 test_requirements = [ ]
 
 setup(
+    version='0.0.4',
     author="Nat Burns",
     author_email='nbaccount@burnskids.com',
     classifiers=[
@@ -40,6 +41,5 @@ setup(
     packages=find_packages(exclude=['tests']),
     setup_requires=setup_requirements,
     url='https://github.com/burnnat/polar_accesslink',
-    version='0.0.3',
     zip_safe=False,
 )
